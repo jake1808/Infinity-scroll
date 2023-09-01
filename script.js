@@ -33,6 +33,7 @@ function displayPhotos(){
             title: photo.alt_description
         })
 
+
         // Put <img> inside <a>, then put both inside imageContainer Element
         item.appendChild(img);
         imageContainer.appendChild(item);
@@ -61,6 +62,14 @@ async function getPhotos(){
     console.error(error);       
     }
 }
+
+// Check to see if scrolling near bottom of page, Load More Photos
+window.addEventListener('scroll', ()=>{
+    if(window.innerHeight + window.screenY >= document.body.offsetHeight - 1000)
+    {
+        getPhotos();
+    }
+})
 
 //on load
 getPhotos();
