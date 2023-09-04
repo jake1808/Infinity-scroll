@@ -1,11 +1,25 @@
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
-let photosArray =[]
+
+let ready = false;
+let imagesLoaded = 0;
+let totalImages = 0;
+let photosArray =[];
 
 // Unsplash API
-const count = 10;
+const count = 30;
 const apiKey = '_svGcS_NSKyDgsjkleDP3KZaqU5MluPeR7q5w9OJa3s'
 const apiUrl = `https://api.unsplash.com/photos/random/?client_id=${apiKey}&count=${count}`
+
+
+//Check if all images have loaded
+function imageLoaded(){
+    imagesLoaded++;
+
+    if (imagesLoaded == totalImages) {
+        ready = true;
+    }
+}
 
 // Helper function to set Attributes on DOM Elements
 function setAttributes(element, attributes){
@@ -16,6 +30,8 @@ function setAttributes(element, attributes){
 
 //display elements for links and photos, add to DOM
 function displayPhotos(){
+    imagesLoaded = 0;
+    totalImages = photosArray.length;
     //Run function for each object in photosArray
     photosArray.forEach(photo => {
         // Create <a> to link to unsplash
@@ -33,6 +49,10 @@ function displayPhotos(){
             title: photo.alt_description
         })
 
+        // Event Listener, check when each image is finished loading
+        img.addEventListener('load',()=>{
+            imageLoaded();
+        })
 
         // Put <img> inside <a>, then put both inside imageContainer Element
         item.appendChild(img);
@@ -58,6 +78,7 @@ async function getPhotos(){
         const response = await fetch(apiUrl);
         photosArray = await response.json();
         displayPhotos();
+        
     } catch (error) {
     console.error(error);       
     }
@@ -65,9 +86,11 @@ async function getPhotos(){
 
 // Check to see if scrolling near bottom of page, Load More Photos
 window.addEventListener('scroll', ()=>{
-    if(window.innerHeight + window.screenY >= document.body.offsetHeight - 1000)
+    if(window.innerHeight + window.screenY >= document.body.offsetHeight - 1000 && ready)
     {
+        ready = false;
         getPhotos();
+       
     }
 })
 
